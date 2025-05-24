@@ -1,0 +1,8 @@
+type: github
+jwt_secret: "your-secure-32-byte-hex-string-generate-with-openssl-rand-hex-32"
+token_expiry_minutes: 60
+github:
+  client_id: "your-github-oauth-client-id"
+  client_secret: "your-github-oauth-client-secret"
+  callback_url: "https://bothire-autogen.fly.dev/api/auth/callback"  # Production URL
+  scopes: ["user:email"] 

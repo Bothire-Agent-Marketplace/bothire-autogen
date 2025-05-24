@@ -1,0 +1,8 @@
+type: github
+jwt_secret: "7670af6d5b80e22eb7b799afa87494534344724fa6dead3bc84d13d0bdf5d065"
+token_expiry_minutes: 60
+github:
+  client_id: "Ov23li6hQFeDxfWd5qcp"
+  client_secret: "2820b8f5a021049b5ec73bd64a00717a55e3bed5"
+  callback_url: "https://bothire-autogen.fly.dev/api/auth/callback"
+  scopes: ["user:email"] 

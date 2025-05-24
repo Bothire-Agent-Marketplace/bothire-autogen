@@ -10,10 +10,10 @@ primary_region = "lax"
   dockerfile = "Dockerfile"
 
 [env]
-  PORT = "8080"
+  PORT = "8081"
 
 [http_service]
-  internal_port = 8080
+  internal_port = 8081
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true

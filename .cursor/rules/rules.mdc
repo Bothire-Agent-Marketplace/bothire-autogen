@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Use functional, declarative programming; avoid classes except for Flask views.
+
+Organize code with Flask Blueprints and application factories for modularity and testability.
+
+Use type hints for all function signatures and descriptive variable names with auxiliary verbs (e.g., is_active).
+
+Handle errors early with guard clauses and custom error handlers; avoid deeply nested if statements.
+
+Use Marshmallow for serialization/validation and Flask-JWT-Extended for authentication.
+
