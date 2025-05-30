@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AutoGen Studio launch script
+# Smart AutoGen Studio launch script that detects environment
 PORT=${1:-8081}
 
 echo "🎨 Starting AutoGen Studio on port $PORT..."
@@ -20,15 +20,8 @@ if [[ "$VIRTUAL_ENV" != *".venv"* ]]; then
     source .venv/bin/activate
 fi
 
-# Load environment variables from .env file
-if [ -f ".env" ]; then
-    echo "🔧 Loading environment variables from .env..."
-    export $(grep -v '^#' .env | xargs)
-else
-    echo "⚠️  No .env file found. Copy .env.example to .env and configure your values."
-    echo "   cp .env.example .env"
-    exit 1
-fi
+# Set environment variables
+export OPENAI_API_KEY=$(grep OPENAI_API_KEY .env | cut -d '=' -f2)
 
 # Suppress Python warnings for cleaner output
 export PYTHONWARNINGS="ignore::UserWarning"
@@ -46,13 +39,23 @@ cleanup() {
 # Set up signal handlers
 trap cleanup SIGINT SIGTERM
 
+# Detect if running on Fly.io or locally
+if [ "$FLY_APP_NAME" = "bothire-autogen" ] || [ "$FLY_REGION" != "" ]; then
+    echo "🚀 Detected Fly.io environment - using production auth config"
+    AUTH_CONFIG="./auth-production.yaml"
+    BASE_URL="https://bothire-autogen.fly.dev"
+else
+    echo "💻 Detected local environment - using local auth config"
+    AUTH_CONFIG="./auth.yaml"
+    BASE_URL="http://localhost:$PORT"
+fi
+
 echo "✅ Starting AutoGen Studio with authentication..."
-echo "🌐 Access at: http://localhost:$PORT"
+echo "🌐 Access at: $BASE_URL"
 echo "🔐 GitHub OAuth authentication enabled"
-echo "🔑 Using Client ID: ${GITHUB_CLIENT_ID}"
-echo "🔗 Callback URL: ${CALLBACK_URL}"
+echo "📄 Using auth config: $AUTH_CONFIG"
 echo "⚠️  Use Ctrl+C to stop properly"
 echo ""
 
-# Start AutoGen Studio with authentication
-autogenstudio ui --port $PORT --host 0.0.0.0 --auth-config ./auth.yaml 
+# Start AutoGen Studio with appropriate auth config
+autogenstudio ui --port $PORT --host 0.0.0.0 --auth-config $AUTH_CONFIG 
