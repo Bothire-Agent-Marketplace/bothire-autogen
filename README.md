@@ -21,46 +21,79 @@ Microsoft's official AutoGen Studio deployed on Fly.io - the complete visual int
 
 AutoGen Studio includes **GitHub OAuth authentication** to secure your application. This prevents unauthorized access to your agent workflows.
 
-### 1. Create GitHub OAuth Application
+**🔑 Important**: You need **TWO separate GitHub OAuth Apps** - one for local development and one for production, because GitHub OAuth apps only support one callback URL per app.
 
+### 1. Create GitHub OAuth Applications
+
+#### 🏠 **Local Development App**
 1. Go to **GitHub** → **Settings** → **Developer settings** → **OAuth Apps**
 2. Click **"New OAuth App"**
 3. Fill in the details:
-   - **Application name**: `AutoGen Studio`
-   - **Homepage URL**: `http://localhost:8081` (or your domain)
+   - **Application name**: `AutoGen Studio (Local)`
+   - **Homepage URL**: `http://localhost:8081`
    - **Authorization callback URL**: `http://localhost:8081/api/auth/callback`
 4. Click **"Register application"**
-5. **Copy the Client ID and Client Secret**
+5. **Copy the Client ID and Client Secret** for your `.env` file
 
-### 2. Configure Authentication
+#### 🌐 **Production App**
+1. Create another **"New OAuth App"**
+2. Fill in the details:
+   - **Application name**: `AutoGen Studio`
+   - **Homepage URL**: `https://bothire-autogen.fly.dev`
+   - **Authorization callback URL**: `https://bothire-autogen.fly.dev/api/auth/callback`
+3. Click **"Register application"**
+4. **Copy the Client ID and Client Secret** for production deployment
 
-Edit the `auth.yaml` file and add your GitHub OAuth credentials:
+### 2. Configure Environment Variables
+
+The `auth.yaml` file uses environment variables to automatically switch between local and production configurations:
 
 ```yaml
 type: github
-jwt_secret: "7670af6d5b80e22eb7b799afa87494534344724fa6dead3bc84d13d0bdf5d065"  # Already secure
+jwt_secret: "${JWT_SECRET}"
 token_expiry_minutes: 60
 github:
-  client_id: "your-actual-github-client-id"      # Replace with your Client ID
-  client_secret: "your-actual-github-client-secret"  # Replace with your Client Secret
-  callback_url: "http://localhost:8081/api/auth/callback"
+  client_id: "${GITHUB_CLIENT_ID}"
+  client_secret: "${GITHUB_CLIENT_SECRET}"
+  callback_url: "${CALLBACK_URL}"
   scopes: ["user:email"]
 ```
 
-### 3. Production Deployment
+#### 🏠 **Local Development** (`.env` file):
+```env
+OPENAI_API_KEY=your_actual_openai_api_key
+JWT_SECRET=7670af6d5b80e22eb7b799afa87494534344724fa6dead3bc84d13d0bdf5d065
+GITHUB_CLIENT_ID=your_local_app_client_id
+GITHUB_CLIENT_SECRET=your_local_app_client_secret
+CALLBACK_URL=http://localhost:8081/api/auth/callback
+```
 
-For **Fly.io deployment**, update the callback URL in both:
-- GitHub OAuth App settings: `https://bothire-autogen.fly.dev/api/auth/callback`
-- `auth.yaml` file: Update `callback_url` to your production domain
+#### 🌐 **Production** (Fly.io secrets):
+```bash
+# Set production secrets
+./scripts/setup-fly-secrets.sh
+```
 
-```yaml
-callback_url: "https://bothire-autogen.fly.dev/api/auth/callback"
+### 3. Quick Setup Helper Scripts
+
+We've created helper scripts to make this easier:
+
+```bash
+# Create local OAuth app (guided setup)
+./scripts/create-local-oauth.sh
+
+# Set up production secrets
+./scripts/setup-fly-secrets.sh
+
+# Complete setup guide
+./scripts/oauth-setup-guide.sh
 ```
 
 ### Security Notes
 
 - ✅ **JWT Secret**: Pre-generated secure 32-byte random string
-- ✅ **Never commit secrets**: The `auth.yaml` contains sensitive data
+- ✅ **Environment Variables**: Credentials loaded from environment, not hardcoded
+- ✅ **Separate Apps**: Local and production use different OAuth apps for security
 - ✅ **GitHub OAuth**: Industry-standard authentication
 - ⚠️ **Experimental**: Authentication is experimental and may change
 

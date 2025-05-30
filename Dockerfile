@@ -35,11 +35,5 @@ ENV PYTHONWARNINGS="ignore::UserWarning"
 ENV TOKENIZERS_PARALLELISM=false
 ENV TRANSFORMERS_VERBOSITY=error
 
-# Production OAuth Configuration (overridden by Fly.io secrets)
-ENV JWT_SECRET="7670af6d5b80e22eb7b799afa87494534344724fa6dead3bc84d13d0bdf5d065"
-ENV GITHUB_CLIENT_ID="Ov23li6hQFeDxfWd5qcp"
-ENV GITHUB_CLIENT_SECRET="2820b8f5a021049b5ec73bd64a00717a55e3bed5"
-ENV CALLBACK_URL="https://bothire-autogen.fly.dev/api/auth/callback"
-
 # Run AutoGen Studio with authentication
 CMD ["autogenstudio", "ui", "--port", "8081", "--host", "0.0.0.0", "--auth-config", "./auth.yaml"] 
